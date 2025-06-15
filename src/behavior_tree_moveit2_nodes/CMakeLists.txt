@@ -7,22 +7,34 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(generate_parameter_library REQUIRED)
-find_package(libpcl-all-dev REQUIRED)
-find_package(moveit_common REQUIRED)
-find_package(moveit_core REQUIRED)
-find_package(moveit_ros_planning REQUIRED)
-find_package(moveit_ros_planning_interface REQUIRED)
-find_package(moveit_task_constructor_core REQUIRED)
-find_package(moveit_task_constructor_msgs REQUIRED)
-find_package(pcl_conversions REQUIRED)
-find_package(pcl_ros REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(shape_msgs REQUIRED)
-find_package(tf2_eigen REQUIRED)
-find_package(tf2_geometry_msgs REQUIRED)
 
+find_package(rclcpp REQUIRED)
+
+find_package(moveit_ros_planning_interface REQUIRED)
+find_package(moveit_visual_tools REQUIRED)
+
+find_package(behaviortree_cpp REQUIRED)
+find_package(behaviortree_ros2 REQUIRED)
+
+find_package(std_msgs REQUIRED)
+
+set(THIS_PACKAGE_DEPS
+    rclcpp
+    moveit_ros_planning_interface
+    moveit_visual_tools 
+    behaviortree_cpp
+    behaviortree_ros2
+    std_msgs )
+
+include_directories(include)
+
+# This is compiled only to check if there are errors in the header file
+# library will not be exported
+add_library(${PROJECT_NAME} src/bt_moveit2_nodes.cpp)
+ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_DEPS})
+
+
+install(DIRECTORY include/  DESTINATION include/) 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
