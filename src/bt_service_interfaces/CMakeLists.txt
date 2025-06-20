@@ -1,40 +1,29 @@
 cmake_minimum_required(VERSION 3.8)
-project(behavior_tree_moveit2_nodes)
+project(bt_service_interfaces)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
+# ####################
+# add dependencies   #
+# ####################
 find_package(ament_cmake REQUIRED)
-
 find_package(rclcpp REQUIRED)
-
-find_package(moveit_ros_planning_interface REQUIRED)
-find_package(moveit_visual_tools REQUIRED)
-
-find_package(behaviortree_cpp REQUIRED)
-find_package(behaviortree_ros2 REQUIRED)
-
 find_package(std_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
-set(THIS_PACKAGE_DEPS
-    rclcpp
-    moveit_ros_planning_interface
-    moveit_visual_tools 
-    behaviortree_cpp
-    behaviortree_ros2
-    std_msgs )
+# ######################
+# generate interface   #
+# ######################
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "srv/UpdateBTXml.srv" 
+  "srv/ExecuteMtcTask.srv"
+)
 
-include_directories(include)
-
-# This is compiled only to check if there are errors in the header file
-# library will not be exported
-add_library(${PROJECT_NAME} src/bt_moveit2_nodes.cpp)
-ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_DEPS})
-
-
-install(DIRECTORY include/  DESTINATION include/) 
+# ########
+# test   #
+# ########
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
@@ -46,5 +35,7 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+ament_export_include_directories(include)
 
 ament_package()

@@ -1,0 +1,7 @@
+# The XML formatted string of the behavior tree
+string xml
+---
+# Confirm whether the dynamic loading of the behavior tree was successful
+bool success
+# If successful, return "ok"; if failed, return the error message.
+string message

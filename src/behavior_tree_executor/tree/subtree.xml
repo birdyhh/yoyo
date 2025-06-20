@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4">
+  <BehaviorTree ID="testSubTree">
+    <Sequence>
+      <MoveToBTNode group="0.28"
+               goal="0.4"
+               planner_type="0.5"
+               planner_id="test"/>
+    </Sequence>
+  </BehaviorTree>
+</root>
