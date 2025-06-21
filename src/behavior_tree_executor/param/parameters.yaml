@@ -54,3 +54,14 @@
     # Valid height range when lifting an object after pick
     lift_object_min_dist: 0.01
     lift_object_max_dist: 0.1
+
+    # Valid distance range when moving an object relative to its current pose
+    move_relative_min_dist: 0.03
+    move_relative_max_dist: 0.13
+
+    # Valid angle range when rotating an object, deafult is 15 degrees(M_PI / 12)
+    angle_delta: 0.2617993877991494
+  
+    # Valid number of IK solutions
+    max_ik_solutions: 8
+    min_solution_distance: 1

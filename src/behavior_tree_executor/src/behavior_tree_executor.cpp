@@ -1,6 +1,7 @@
 #include "behavior_tree_executor/behavior_tree_executor.hpp"
 
 #include "bt_moveit2_mtc_nodes/bt_moveit2_nodes.hpp"
+#include "bt_moveit2_mtc_nodes/connect_node.hpp"
 #include "bt_service_interfaces/srv/execute_mtc_task.hpp"
 
 #include <behaviortree_cpp/bt_factory.h>
@@ -142,10 +143,12 @@ void BehaviorTreeExecutor::init() {
     initTask(params);
 
     // Register Nodes
-    factory_->registerNodeType<moveit_mtc_bt_nodes::MoveToBTNode>("MoveToBTNode",
-                                                                node, task_, params);
-    factory_->registerNodeType<moveit_mtc_bt_nodes::CurrentStateNode>("CurrentStateNode",
-                                                                      node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::MoveToBTNode>("MoveToBTNode", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::CurrentStateNode>("CurrentStateNode", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::MoveRelativeBTNode>("MoveRelativeBTNode", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::GenerateGraspPoseBTNode>("GenerateGraspPoseBTNode", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::ModifyPlanningSceneBTNode>("ModifyPlanningSceneBTNode", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::ConnectNode>("ConnectNode", node, task_, params);
 }
 
 void BehaviorTreeExecutor::initTree(const std::string& xml) {

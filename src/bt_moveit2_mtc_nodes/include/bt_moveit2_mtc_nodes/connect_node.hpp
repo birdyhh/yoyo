@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 
 #include <behaviortree_cpp/action_node.h>

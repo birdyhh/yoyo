@@ -1,10 +1,9 @@
 #pragma once
-
 #include <behaviortree_cpp/basic_types.h>
 #include <string>
 
 #include <behaviortree_cpp/action_node.h>
-#include <moveit/task_constructor/stages/move_to.h>
+#include <moveit/task_constructor/stages/move_relative.h>
 #include <moveit/task_constructor/task.h>
 #include <moveit/task_constructor/solvers/cartesian_path.h>
 #include <moveit/task_constructor/solvers/pipeline_planner.h>
@@ -12,12 +11,13 @@
 
 #include "bt_moveit2_mtc_nodes/bt_moveit2_mtc_nodes_parameters.hpp"
 #include "constants.hpp"
+#include "geometry_msgs/msg/vector3_stamped.hpp"
 
 namespace moveit_mtc_bt_nodes {
 
-class MoveToBTNode : public BT::SyncActionNode {
+class MoveRelativeBTNode : public BT::SyncActionNode {
 public:
-    MoveToBTNode(const std::string& name, const BT::NodeConfiguration& config,
+    MoveRelativeBTNode(const std::string& name, const BT::NodeConfiguration& config,
                 const std::shared_ptr<rclcpp::Node> nh,
                 const std::shared_ptr<moveit::task_constructor::Task> task,
                 const moveit_mtc_bt_parameters::Params& params)
@@ -25,30 +25,42 @@ public:
 
     static BT::PortsList providedPorts() {
         return {
-            BT::InputPort<std::string>(STEP_NAME, "move to", "name for the this step"),
-            BT::InputPort<std::string>(GROUP, "which group to move"),
-            BT::InputPort<std::string>(GOAL, "which action goal want to achieve"),
-            BT::InputPort<std::string>(PLANNER_TYPE, PLANNER_PIPELINE, "use what kind of planner")
+            BT::InputPort<std::string>(STEP_NAME, "move relative", "name for the this step"),
+            BT::InputPort<std::string>(PLANNER_TYPE, PLANNER_CARTESIAN, "use what kind of planner"),
+            BT::InputPort<std::string>(LINK, "This link will move based on the world frame"),
+            BT::InputPort<double>(X, 0.0, "displacement in the x-direction"),
+            BT::InputPort<double>(Y, 0.0, "displacement in the y-direction"),
+            BT::InputPort<double>(Z, 0.0, "displacement in the z-direction")
         };
     }
 
     BT::NodeStatus tick() override {
-        std::string step_name, goal, group, planner_type;
+        std::string step_name, link, planner_type;
         getInput(STEP_NAME, step_name);
-        getInput(GROUP, group);
-        getInput(GOAL, goal);
+        getInput(LINK, link);
         getInput(PLANNER_TYPE, planner_type);
 
-        // 创建 planner
-        std::shared_ptr<moveit::task_constructor::solvers::PlannerInterface> solver = createPlanner(planner_type);
+        double x, y, z;
+        getInput(X, x);
+        getInput(Y, y);
+        getInput(Z, z);
 
-        // 创建并配置 stage
-        auto move_to = std::make_unique<moveit::task_constructor::stages::MoveTo>(step_name, solver);
-        move_to->setGroup(group);
-        move_to->setGoal(goal);
+        auto planner = createPlanner(planner_type);
 
-        // 添加到 task
-        task_->add(std::move(move_to));
+        auto stage = std::make_unique<moveit::task_constructor::stages::MoveRelative>(step_name, planner);
+        stage->properties().set(MARK_NS, step_name);
+        stage->properties().set(LINK, link);
+        stage->properties().configureInitFrom(moveit::task_constructor::Stage::PARENT, { "group" });
+        stage->setMinMaxDistance(params_.move_relative_min_dist, params_.move_relative_max_dist);
+        
+        // Set downward direction
+        geometry_msgs::msg::Vector3Stamped vec;
+        vec.header.frame_id = params_.world_frame;
+        vec.vector.x = x;
+        vec.vector.y = y;
+        vec.vector.z = z;
+        stage->setDirection(vec);
+        task_->insert(std::move(stage));
 
         return BT::NodeStatus::SUCCESS;
     }

@@ -104,7 +104,6 @@ moveit_mtc_bt_parameters:
   place_surface_offset:
     type: double
 
-
   approach_object_min_dist:
     type: double
   approach_object_max_dist:
@@ -115,7 +114,19 @@ moveit_mtc_bt_parameters:
   lift_object_max_dist:
     type: double
 
+  move_relative_min_dist:
+    type: double
+  move_relative_max_dist:
+    type: double
 
-  execute:
-    type: bool
-    default_value: false
+  angle_delta:
+    type: double
+    default_value: 0.2617993877991494
+  
+  max_ik_solutions:
+    type: int
+    default_value: 8
+  min_solution_distance:
+    type: int
+    default_value: 1
+  

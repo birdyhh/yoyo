@@ -52,21 +52,22 @@ sequenceDiagram
     Server->>BT: 从XML创建行为树
     activate BT
     BT->>BT: tickOnce()
-    BT->>MTC: 调用节点添加stages
+    BT->>MTC: 调用BT节点添加stages
+    BT-->>Server: 返回组装和初始化结果
     deactivate BT
-    BT-->>Server: 返回组装结果
+    Server->>MTC: init()
+    MTC-->>Server: 初始化结果
     Server-->>Client: 返回加载行为树结果
     deactivate Server
     
     loop every call
         Client->>Server: ExecuteMtcTask()
         activate Server
-        Server->>MTC: init()
-        MTC-->>Server: 初始化规划
+
         Server->>MTC: plan()
         MTC-->>Server: 规划结果
         Server->>MTC: execute()
-        MTC-->>Server: 执行规划
+        MTC-->>Server: 执行结果
         Server-->>Client: 返回执行结果
         deactivate Server
     end
@@ -75,7 +76,35 @@ sequenceDiagram
 
 ### 操作指南
 
+#### 编译
+
+```bash
+# 1. clone 项目和下载子模块
+git clone --recursive https://github.com/birdyhh/yoyo.git
+# 2. 编译
+colcon build
+```
+
+#### 以下针对的是moveit2自带的机械臂**moveit_resources_panda**
+#### 启动机械臂，可以使用moveit2_tutorials的launch文件启动
+```bash
+ros2 launch moveit2_tutorials mtc_demo.launch.py
+```
+
+#### 启动行为树节点
+
+```bash
+# 进入到yoyo_ws目录
+source install/setup.bash
+ros2 launch behavior_tree_executor behavior_tree_executor_node.launch.py
+```
+
 #### 调用service接口更新行为树xml字符串
 ```bash
 ros2 service call /update_bt_xml bt_service_interfaces/srv/UpdateBTXml  "{xml: '<?xml version=\"1.0\" encoding=\"UTF-8\"?><root BTCPP_format=\"4\" main_tree_to_execute=\"main\"><BehaviorTree ID=\"main\"><Sequence><MoveToBTNode goal=\"open\" planner_type=\"0.5\" /></Sequence></BehaviorTree></root>'}"
+```
+
+#### 调用service接口执行MTC的execute函数
+```bash
+ros2 service call /execute_mtc_task bt_service_interfaces/srv/ExecuteMtcTask
 ```

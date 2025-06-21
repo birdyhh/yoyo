@@ -1,3 +1,6 @@
 #include "bt_moveit2_mtc_nodes/move_to_node.hpp"
 #include "bt_moveit2_mtc_nodes/current_state_node.hpp"
 #include "bt_moveit2_mtc_nodes/connect_node.hpp"
+#include "bt_moveit2_mtc_nodes/modify_plannin_scene_node.hpp"
+#include "bt_moveit2_mtc_nodes/move_relative_node.hpp"
+#include "bt_moveit2_mtc_nodes/generate_grasp_pose_node.hpp"

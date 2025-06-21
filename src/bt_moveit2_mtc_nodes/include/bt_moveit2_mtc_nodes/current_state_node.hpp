@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 
 #include <behaviortree_cpp/action_node.h>
@@ -18,7 +19,7 @@ public:
         : BT::SyncActionNode(name, config), node_(nh), task_(task), params_(params) {}
 
     static BT::PortsList providedPorts() {
-        return {BT::InputPort<std::string>(STEP_NAME, "move to", "name for the this step")};
+        return {BT::InputPort<std::string>(STEP_NAME, "current state", "name for the this step")};
     }
 
     BT::NodeStatus tick() override { 
