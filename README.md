@@ -108,11 +108,11 @@ ros2 launch behavior_tree_executor behavior_tree_executor_node.launch.py
 
 3. 生成行为树xml文件  
 利用已有的[行为树节点](./src/behavior_tree_executor/tree/mtc_bt_node.btproj)，加载到groof2，利用图形化工具生成行为树。
-[](./img/groot_tree.png)
+![](./img/groot_tree.png)
 
-4. 调用service接口更新行为树xml字符串
+4. 调用service接口更新行为树xml字符串，[示例](./src/behavior_tree_executor/tree/example.xml)
 ```bash
-ros2 service call /update_bt_xml bt_service_interfaces/srv/UpdateBTXml  "{xml: '<?xml version=\"1.0\" encoding=\"UTF-8\"?><root BTCPP_format=\"4\" main_tree_to_execute=\"main\"><BehaviorTree ID=\"main\"><Sequence><MoveToBTNode goal=\"open\" planner_type=\"0.5\" /></Sequence></BehaviorTree></root>'}"
+ros2 service call /update_bt_xml bt_service_interfaces/srv/UpdateBTXml  "{xml: '{替换为行为树的xml字符串}'}"
 ```
 
 5. 调用service接口执行MTC的execute函数
@@ -121,4 +121,4 @@ ros2 service call /execute_mtc_task bt_service_interfaces/srv/ExecuteMtcTask
 ```
 
 6. 运行结果
-[](./img/pick_and_place.gif)
+![](./img/pick_and_place.gif)
