@@ -40,6 +40,8 @@ namespace moveit_mtc_bt_nodes {
     static const std::string X = "x";
     static const std::string Y = "y";
     static const std::string Z = "z";
+    static const std::string DIRECTION = "direction";
+    static const std::string WORLD = "world";
     static const std::string POSITION = "position";
     static const std::string MODIFY_SCENE = "modify_scene";
     static const std::string OBJECT_NAME = "object_name";

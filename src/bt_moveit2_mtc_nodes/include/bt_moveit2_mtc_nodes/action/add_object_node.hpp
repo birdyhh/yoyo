@@ -60,7 +60,7 @@ public:
         moveit_msgs::msg::CollisionObject collision_object;
         collision_object.header.frame_id = frame_id;
         collision_object.id = object_name;
-        collision_object.pose = vectorToPose(position);
+        auto pose = vectorToPose(position);
 
         // Define the object shape
         shape_msgs::msg::SolidPrimitive primitive;
@@ -71,7 +71,7 @@ public:
         }
         
         collision_object.primitives.push_back(primitive);
-        collision_object.primitive_poses.push_back(collision_object.pose);
+        collision_object.primitive_poses.push_back(pose);
         collision_object.operation = moveit_msgs::msg::CollisionObject::ADD;
 
         moveit::planning_interface::PlanningSceneInterface psi;
