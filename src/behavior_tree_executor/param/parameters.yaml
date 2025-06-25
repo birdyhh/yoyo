@@ -65,3 +65,5 @@
     # Valid number of IK solutions
     max_ik_solutions: 8
     min_solution_distance: 1
+    ignore_collisions: false
+    ik_timeout: 1.0

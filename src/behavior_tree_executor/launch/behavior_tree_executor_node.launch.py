@@ -19,7 +19,6 @@ def generate_launch_description():
         package=pkg,
         namespace='',
         executable='behavior_tree_executor_node',
-        name='behavior_tree_executor_node',
         output="screen",
         #arguments=['--ros-args', '--log-level', 'debug'], 
         parameters=[

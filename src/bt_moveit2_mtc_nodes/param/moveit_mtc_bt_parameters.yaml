@@ -129,4 +129,10 @@ moveit_mtc_bt_parameters:
   min_solution_distance:
     type: int
     default_value: 1
+  ignore_collisions:
+    type: bool
+    default_value: false
+  ik_timeout:
+    type: double
+    default_value: 1.0
   

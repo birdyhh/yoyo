@@ -3,7 +3,7 @@
 ## 为什么用行为树组织 MTC stages
 
 * **灵活性**：行为树天然支持顺序、选择、并行、条件等复杂逻辑，适合描述机器人任务流程。
-* **容错与回退**：行为树的 Selector/Sequence 节点可实现自动回退和多策略尝试，类似 MTC 的 Fallbacks/Alternatives。
+* **容错与回退**：行为树的 Decorator/Sequence 节点可实现自动回退和多策略尝试，类似 MTC 的 Fallbacks/Alternatives。
 * **可扩展性**：行为树节点可以封装 MTC 的单个 stage 或子任务，便于组合和复用。
 
 ## 解决方案设计
@@ -18,17 +18,19 @@
 
 1. 使用 BehaviorTree.CPP（MoveIt 2 Pro 默认集成）作为行为树引擎。
 2. 每个 MTC stage 封装为 BT 的自定义 ActionNode。
-3. 行为树 XML/DSL 文件描述任务逻辑，机器人运行时加载并执行。
-4. 可以通过 ROS2 action/service/topic 与 MTC 任务交互。
-5. BT 节点只负责配置和添加 stage，不负责执行，这样可以灵活组合和复用 stage。
-6. 主程序统一调用 task->init() 和 task->plan()，保证所有 stage 都已添加后再整体初始化和规划，避免重复初始化和资源冲突。
-7. 参数通过黑板传递，如 ROS2 节点、MTC Task、目标状态等，便于解耦和扩展。
-8. 行为树 tick 只做“拼装”，不做实际运动执行，所有执行和结果处理在主程序统一完成。
+3. 行为树节点内部调用 MTC stage 执行，并返回结果给行为树。
+4. 使用行为树的 Sequence 节点实现 MTC 的 serial container
+5. 使用行为树的 Decorator 节点实现 MTC 的 wrapper
+6. 行为树 XML/DSL 文件描述任务逻辑，机器人运行时加载并执行。
+7. 可以通过 ROS2 action/service/topic 与 MTC 任务交互。
+8. BT 节点只负责配置和添加 stage，不负责执行，这样可以灵活组合和复用 stage。
+9. 主程序统一调用 task->init()、plan()、execute()，保证所有 stage 都已添加后再整体初始化和规划，避免重复初始化和资源冲突。
+10. 参数通过黑板传递，如 ROS2 节点、MTC Task、目标状态等，便于解耦和扩展。
+11. 行为树 tick 只做“拼装”，不做实际运动执行，所有执行和结果处理在主程序统一完成。
 
 ### 典型完整流程（伪代码）
 1. 主程序初始化 ROS2 node、MTC Task、行为树工厂和黑板参数，启动service。
-2. 
-2. 行为树 tick，每个节点根据参数调用对应 MTC stage。
+2. 行为树 tick，每个节点根据参数调用对应 MTC stage，将所有的stage 结果拼装成树结果，并返回给主程序，并执行init()进行初始化。
 3. 节点执行，根据 MTC 结果返回 SUCCESS/FAILURE。
 4. 主程序根据行为树整体返回值判断任务是否完成。
 
@@ -74,9 +76,13 @@ sequenceDiagram
 
 ```
 
+### 前置教程
+
+[使用 MTC 进行拾取和放置](https://moveit.picknik.ai/main/doc/tutorials/pick_and_place_with_moveit_task_constructor/pick_and_place_with_moveit_task_constructor.html)
+
 ### 操作指南
 
-#### 编译
+1. 编译
 
 ```bash
 # 1. clone 项目和下载子模块
@@ -85,26 +91,30 @@ git clone --recursive https://github.com/birdyhh/yoyo.git
 colcon build
 ```
 
-#### 以下针对的是moveit2自带的机械臂**moveit_resources_panda**
-#### 启动机械臂，可以使用moveit2_tutorials的launch文件启动
+2. 运行  
+以下针对的是moveit2自带的机械臂**moveit_resources_panda**,
+可以使用[moveit2_tutorials](https://github.com/moveit/moveit2_tutorials)的launch文件启动
 ```bash
+# 1. 启动机械臂
+# 进入到moveit2_tutorials_ws目录
+source install/setup.bash
 ros2 launch moveit2_tutorials mtc_demo.launch.py
-```
 
-#### 启动行为树节点
-
-```bash
+# 2. 启动行为树节点
 # 进入到yoyo_ws目录
 source install/setup.bash
 ros2 launch behavior_tree_executor behavior_tree_executor_node.launch.py
 ```
 
-#### 调用service接口更新行为树xml字符串
+3. 生成行为树xml文件  
+利用已有的[行为树节点](./src/behavior_tree_executor/tree/mtc_bt_node.btproj)，加载到groof2，利用图形化工具生成行为树。
+
+4. 调用service接口更新行为树xml字符串
 ```bash
 ros2 service call /update_bt_xml bt_service_interfaces/srv/UpdateBTXml  "{xml: '<?xml version=\"1.0\" encoding=\"UTF-8\"?><root BTCPP_format=\"4\" main_tree_to_execute=\"main\"><BehaviorTree ID=\"main\"><Sequence><MoveToBTNode goal=\"open\" planner_type=\"0.5\" /></Sequence></BehaviorTree></root>'}"
 ```
 
-#### 调用service接口执行MTC的execute函数
+5. 调用service接口执行MTC的execute函数
 ```bash
 ros2 service call /execute_mtc_task bt_service_interfaces/srv/ExecuteMtcTask
 ```

@@ -3,13 +3,9 @@
 #include <eigen3/Eigen/Dense>
 
 // Standard CPP
-#include <chrono>
-#include <filesystem>
-#include <functional>
 #include <memory>
 #include <string>
-#include <thread>
-#include <vector>
+#include <unordered_map>
 
 // ROS
 #include "rclcpp/rclcpp.hpp"
@@ -46,7 +42,7 @@ public:
 
 private:
 
-    void onUpdateBTXml(
+    void onUpdateMtcBTXml(
         const std::shared_ptr<bt_service_interfaces::srv::UpdateBTXml::Request> req,
         std::shared_ptr<bt_service_interfaces::srv::UpdateBTXml::Response> res);
 
@@ -60,7 +56,7 @@ private:
 
     void initTask(moveit_mtc_bt_parameters::Params params);
 
-    void on_parameterChange(const std::vector<rclcpp::Parameter> &parameters);
+    void buildMap(BT::TreeNode* node, BT::TreeNode* parent = nullptr);
 
     std::shared_ptr<BT::BehaviorTreeFactory> factory_;
     std::shared_ptr<BT::Tree> main_tree_;
@@ -70,11 +66,15 @@ private:
     std::shared_ptr<moveit::task_constructor::Task> task_;
     std::shared_ptr<moveit_mtc_bt_parameters::ParamListener> param_listener_;
 
+    std::unordered_map<uint16_t, uint16_t> node_relationship_uid_map_;
+
     rclcpp::Service<bt_service_interfaces::srv::UpdateBTXml>::SharedPtr update_bt_srv_;
     rclcpp::Service<bt_service_interfaces::srv::ExecuteMtcTask>::SharedPtr execute_mtc_task_srv_;
 
     std::mutex bt_mutex_;
     std::mutex tick_mutex_;
+
+    static const std::unordered_map<BT::NodeStatus, std::string> STATUS_MAP;
 
 };
 }  // namespace behavior_tree_executor
