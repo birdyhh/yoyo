@@ -20,7 +20,7 @@ def generate_launch_description():
         namespace='',
         executable='behavior_tree_executor_node',
         output="screen",
-        #arguments=['--ros-args', '--log-level', 'debug'], 
+        # arguments=['--ros-args', '--log-level', 'debug'], 
         parameters=[
             moveit_config,
             os.path.join(package_shared_path, 'param', 'parameters.yaml')

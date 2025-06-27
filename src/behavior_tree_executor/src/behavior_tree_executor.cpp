@@ -4,7 +4,6 @@
 #include <functional>
 
 #include "bt_moveit2_mtc_nodes/bt_moveit2_nodes.hpp"
-#include "bt_moveit2_mtc_nodes/connect_node.hpp"
 #include "bt_service_interfaces/srv/execute_mtc_task.hpp"
 
 #include <behaviortree_cpp/bt_factory.h>
