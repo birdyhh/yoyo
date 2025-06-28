@@ -19,8 +19,10 @@ public:
                         const moveit_mtc_bt_parameters::Params& params)
         : BT::DecoratorNode(name, config), node_(nh), task_(task), params_(params) {}
 
-    void init(const std::unordered_map<uint16_t, uint16_t>& uid_map) {
+    void init(const std::unordered_map<uint16_t, uint16_t>& uid_map, 
+              const moveit_mtc_bt_parameters::Params& params) {
         parent_uid_map_ = uid_map;
+        params_ = params;
     }
 
 protected:

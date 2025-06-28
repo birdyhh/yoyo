@@ -38,10 +38,6 @@ public:
         ControlNode::halt();
     }
 
-    void init(const std::unordered_map<uint16_t, uint16_t>& uid_map) {
-        parent_uid_map_ = uid_map;
-    }
-
 private:
     size_t current_child_idx_;
     size_t skipped_count_ = 0;

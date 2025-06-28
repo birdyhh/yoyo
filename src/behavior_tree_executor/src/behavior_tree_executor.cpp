@@ -10,6 +10,8 @@
 #include <moveit/task_constructor/stage.h>
 #include <rclcpp/logging.hpp>
 #include <rclcpp/utilities.hpp>
+// 添加参数事件消息头文件
+#include <rcl_interfaces/msg/parameter_event.hpp>
 
 namespace behavior_tree_executor {
 
@@ -34,6 +36,12 @@ BehaviorTreeExecutor::BehaviorTreeExecutor(rclcpp::NodeOptions options)
             "execute_mtc_task",
             std::bind(&BehaviorTreeExecutor::onExecuteMtcTask, this,
                       std::placeholders::_1, std::placeholders::_2));
+
+    parameter_subscription_ = this->create_subscription<rcl_interfaces::msg::ParameterEvent>(
+        "/parameter_events",
+        10,
+        std::bind(&BehaviorTreeExecutor::onParameterEvent, this, std::placeholders::_1)
+    );
 
 }
 
@@ -119,21 +127,33 @@ BT::NodeStatus BehaviorTreeExecutor::tickBTNode() {
 
 void BehaviorTreeExecutor::initTask(moveit_mtc_bt_parameters::Params params) {
     if (!task_) {
-        RCLCPP_INFO_STREAM(this->get_logger(), "initTask");
+        RCLCPP_INFO_STREAM(this->get_logger(), "init task");
         task_ = std::make_shared<moveit::task_constructor::Task>();
         task_->stages()->setName("bt mtc task");
         task_->loadRobotModel(this->shared_from_this());
-
-        // Set task properties
-        task_->setProperty("group", params.arm_group_name);
-        task_->setProperty("eef", params.eef_name);
-        task_->setProperty("hand", params.hand_group_name);
-        task_->setProperty("hand_grasping_frame", params.hand_frame);
-        task_->setProperty("ik_frame", params.hand_frame);
-        return;
+    } else {
+        RCLCPP_INFO_STREAM(this->get_logger(), "task already exists, reinit task");
+        task_->clear();
     }
 
-    task_->clear();
+    task_->setProperty("group", params.arm_group_name);
+    task_->setProperty("eef", params.eef_name);
+    task_->setProperty("hand", params.hand_group_name);
+    task_->setProperty("hand_grasping_frame", params.hand_frame);
+    task_->setProperty("ik_frame", params.hand_frame);
+}
+
+void BehaviorTreeExecutor::onParameterEvent(const rcl_interfaces::msg::ParameterEvent::SharedPtr event) {
+    // 检查事件是否与我们的节点相关
+    if (event->node == "/behavior_tree_executor") {
+        // 检查参数是否真的发生了变化
+        if (param_listener_->is_old(params_)) {
+            RCLCPP_INFO(this->get_logger(), "Parameters have changed, updating...");
+            
+            // 获取新参数
+            params_ = param_listener_->get_params();
+        }
+    }
 }
 
 void BehaviorTreeExecutor::init() {
@@ -144,39 +164,39 @@ void BehaviorTreeExecutor::init() {
     // start param listener
     RCLCPP_INFO_STREAM(this->get_logger(), "start param listener");
     param_listener_ = std::make_shared<moveit_mtc_bt_parameters::ParamListener>(node);
-    auto params = param_listener_->get_params();
+    params_ = param_listener_->get_params();
 
     // init planner factory
-    moveit_mtc_bt_nodes::PlannerFactory::getInstance().init(node, params);
+    moveit_mtc_bt_nodes::PlannerFactory::getInstance().init(node, params_);
 
     // Create Factory
     factory_ = std::make_shared<BT::BehaviorTreeFactory>();
 
-    initTask(params);
+    initTask(params_);
 
     // Register Nodes
     // Action Nodes
-    factory_->registerNodeType<moveit_mtc_bt_nodes::MoveToBTNode>("MoveTo", node, task_, params);
-    factory_->registerNodeType<moveit_mtc_bt_nodes::CurrentStateBTNode>("CurrentState", node, task_, params);
-    factory_->registerNodeType<moveit_mtc_bt_nodes::MoveRelativeBTNode>("MoveRelative", node, task_, params);
-    factory_->registerNodeType<moveit_mtc_bt_nodes::GenerateGraspPoseBTNode>("GenerateGraspPose", node, task_, params);
-    factory_->registerNodeType<moveit_mtc_bt_nodes::GeneratePlacePoseBTNode>("GeneratePlacePose", node, task_, params);
-    factory_->registerNodeType<moveit_mtc_bt_nodes::ModifyPlanningSceneBTNode>("ModifyPlanningScene", node, task_, params);
-    factory_->registerNodeType<moveit_mtc_bt_nodes::ConnectBTNode>("Connect", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::MoveToBTNode>("MoveTo", node, task_, params_);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::CurrentStateBTNode>("CurrentState", node, task_, params_);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::MoveRelativeBTNode>("MoveRelative", node, task_, params_);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::GenerateGraspPoseBTNode>("GenerateGraspPose", node, task_, params_);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::GeneratePlacePoseBTNode>("GeneratePlacePose", node, task_, params_);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::ModifyPlanningSceneBTNode>("ModifyPlanningScene", node, task_, params_);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::ConnectBTNode>("Connect", node, task_, params_);
 
     // moveit action node
-    factory_->registerNodeType<moveit_mtc_bt_nodes::AddObjectBTNode>("AddObject", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::AddObjectBTNode>("AddObject", node, task_, params_);
 
     // wrapper
-    factory_->registerNodeType<moveit_mtc_bt_nodes::ComputeIKDecorator>("ComputeIK", node, task_, params);
-    factory_->registerNodeType<moveit_mtc_bt_nodes::PredicateFilterDecorator>("PredicateFilter", node, task_, params);
-    factory_->registerNodeType<moveit_mtc_bt_nodes::PassThroughDecorator>("PassThrough", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::ComputeIKDecorator>("ComputeIK", node, task_, params_);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::PredicateFilterDecorator>("PredicateFilter", node, task_, params_);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::PassThroughDecorator>("PassThrough", node, task_, params_);
 
     // container
-    factory_->registerNodeType<moveit_mtc_bt_nodes::MTCSerialContainerNode>("SerialContainer", node, task_, params);
-    factory_->registerNodeType<moveit_mtc_bt_nodes::MTCAlternativesNode>("Alternatives", node, task_, params);
-    factory_->registerNodeType<moveit_mtc_bt_nodes::MTCFallbacksNode>("Fallbacks", node, task_, params);
-    factory_->registerNodeType<moveit_mtc_bt_nodes::MTCMergerNode>("Merger", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::MTCSerialContainerNode>("SerialContainer", node, task_, params_);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::MTCAlternativesNode>("Alternatives", node, task_, params_);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::MTCFallbacksNode>("Fallbacks", node, task_, params_);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::MTCMergerNode>("Merger", node, task_, params_);
 }
 
 void BehaviorTreeExecutor::initTree(const std::string& xml) {
@@ -191,11 +211,11 @@ void BehaviorTreeExecutor::initTree(const std::string& xml) {
         buildMap(main_tree_->rootNode());
         auto visitor = [this](BT::TreeNode* node){
             if (auto mtc_node = dynamic_cast<moveit_mtc_bt_nodes::MTCActionBaseNode*>(node)) {
-                mtc_node->init(node_relationship_uid_map_);
+                mtc_node->init(node_relationship_uid_map_, params_);
             } else if (auto mtc_node = dynamic_cast<moveit_mtc_bt_nodes::MTCWrapperBaseNode*>(node)) {
-                mtc_node->init(node_relationship_uid_map_);
-            } else if (auto mtc_node = dynamic_cast<moveit_mtc_bt_nodes::MTCSerialContainerNode*>(node)) {
-                mtc_node->init(node_relationship_uid_map_);
+                mtc_node->init(node_relationship_uid_map_, params_);
+            } else if (auto mtc_node = dynamic_cast<moveit_mtc_bt_nodes::MTCContainerBaseNode*>(node)) {
+                mtc_node->init(node_relationship_uid_map_, params_);
             }
         };
         main_tree_->applyVisitor(visitor);

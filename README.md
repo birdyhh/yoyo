@@ -35,6 +35,15 @@
 2. MTC 任务管理：每个 BT 节点只负责一个 MTC stage，主程序负责创建和管理整个 MTC Task。
 3. 异步执行：如需异步执行，可在 BT 节点中返回 RUNNING 并用回调/事件驱动方式通知完成。
 
+### Docker支持
+
+项目提供了完整的Docker支持，避免复杂的环境配置。Docker运行环境支持：
+- 基于ROS 2 Jazzy发行版创建容器环境
+- 自动安装所有必要的依赖项
+- 使用docker-compose.yml文件启动容器
+- 支持进入容器执行命令
+- 配置ROS_DOMAIN_ID通过共享目录
+
 ### 时序图
 
 ```mermaid
@@ -139,7 +148,7 @@ ros2 launch behavior_tree_executor behavior_tree_executor_node.launch.py
 ```
 
 3. 生成行为树xml文件  
-利用已有的[行为树节点](./src/behavior_tree_executor/tree/mtc_bt_node.btproj)，加载到groof2，利用图形化工具生成行为树。
+利用已有的[行为树节点](./src/behavior_tree_executor/tree/mtc_bt_node.btproj)，加载到[groof2](https://www.behaviortree.dev/groot/)，利用图形化工具生成行为树。
 ![](./img/groot_tree.png)
 
 4. 调用service接口更新行为树xml字符串，[示例](./src/behavior_tree_executor/tree/example.xml)

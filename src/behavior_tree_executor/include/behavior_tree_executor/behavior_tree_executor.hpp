@@ -23,6 +23,7 @@
 #include "builtin_interfaces/msg/time.hpp"
 #include "bt_service_interfaces/srv/update_bt_xml.hpp"
 #include "bt_service_interfaces/srv/execute_mtc_task.hpp"
+#include "rcl_interfaces/msg/parameter_event.hpp"
 
 #include "moveit/task_constructor/task.h"
 
@@ -58,6 +59,9 @@ private:
 
     void buildMap(BT::TreeNode* node, BT::TreeNode* parent = nullptr);
 
+    // 添加参数变化回调函数
+    void onParameterEvent(const rcl_interfaces::msg::ParameterEvent::SharedPtr event);
+
     std::shared_ptr<BT::BehaviorTreeFactory> factory_;
     std::shared_ptr<BT::Tree> main_tree_;
     std::shared_ptr<BT::Groot2Publisher> groot_logger_;
@@ -65,6 +69,10 @@ private:
     std::shared_ptr<BT::StdCoutLogger> cout_logger_;
     std::shared_ptr<moveit::task_constructor::Task> task_;
     std::shared_ptr<moveit_mtc_bt_parameters::ParamListener> param_listener_;
+    moveit_mtc_bt_parameters::Params params_;
+
+    // 添加参数订阅器
+    rclcpp::Subscription<rcl_interfaces::msg::ParameterEvent>::SharedPtr parameter_subscription_;
 
     std::unordered_map<uint16_t, uint16_t> node_relationship_uid_map_;
 
