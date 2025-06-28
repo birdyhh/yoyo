@@ -169,9 +169,14 @@ void BehaviorTreeExecutor::init() {
 
     // wrapper
     factory_->registerNodeType<moveit_mtc_bt_nodes::ComputeIKDecorator>("ComputeIK", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::PredicateFilterDecorator>("PredicateFilter", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::PassThroughDecorator>("PassThrough", node, task_, params);
 
     // container
     factory_->registerNodeType<moveit_mtc_bt_nodes::MTCSerialContainerNode>("SerialContainer", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::MTCAlternativesNode>("Alternatives", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::MTCFallbacksNode>("Fallbacks", node, task_, params);
+    factory_->registerNodeType<moveit_mtc_bt_nodes::MTCMergerNode>("Merger", node, task_, params);
 }
 
 void BehaviorTreeExecutor::initTree(const std::string& xml) {

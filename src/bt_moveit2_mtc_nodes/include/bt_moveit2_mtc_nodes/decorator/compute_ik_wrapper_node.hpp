@@ -64,8 +64,7 @@ public:
         return wrapper;
     }
 
-    virtual std::string getWrapperType() override
-    {
+    virtual std::string getWrapperType() override {
         return COMPUTE_IK;
     }
 

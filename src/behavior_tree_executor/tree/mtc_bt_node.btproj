@@ -3,79 +3,79 @@
     <include path="untitled_1.xml"/>
     <!-- Description of Node Models (used by Groot) -->
     <TreeNodesModel>
-    <Action ID="AddObject"
-            editable="true">
-      <input_port name="step_name">name for this step</input_port>
-      <input_port name="object_name">name of the object to add</input_port>
-      <input_port name="frame_id"
-                  default="world">frame_id for the object</input_port>
-      <input_port name="position"
-                  default="0.0,0.0,0.0,0.0,0.0,0.0">x,y,z,roll,pitch,yaw position of the object</input_port>
-      <input_port name="object_shape"
-                  default="1">shape type of the object (0=BOX, 1=SPHERE, 2=CYLINDER, 3=CONE)</input_port>
-      <input_port name="object_dimensions"
-                  default="0.0,0.0">dimensions of the object (BOX: [x,y,z], SPHERE: [radius], CYLINDER: [height,radius], CONE: [height,radius])</input_port>
-    </Action>
-    <Decorator ID="ComputeIK"
-               editable="true">
-      <input_port name="step_name">Name for the ComputeIK wrapper</input_port>
-      <input_port name="ik_frame_link">Link for IK frame</input_port>
-      <input_port name="ik_frame_pose">x,y,z,rx,ry,rz Pose for IK frame (e.g: 1.0,1.0,1.0,0.0,0.0,0.0)</input_port>
-    </Decorator>
-    <Action ID="Connect"
-            editable="true">
-      <input_port name="step_name">name for the this step</input_port>
-      <input_port name="group_planner_map"
-                  default="panda_arm:pipeline">group-planner mapping (e.g. 'panda_arm:pipeline,hand_group:cartesian')</input_port>
-    </Action>
-    <Action ID="CurrentState"
-            editable="true">
-      <input_port name="step_name">name for the this step</input_port>
-    </Action>
-    <Action ID="GenerateGraspPose"
-            editable="true">
-      <input_port name="step_name">name for the this step</input_port>
-      <input_port name="object_name">name for the object</input_port>
-      <input_port name="monitored_step_name">name for the monitored step</input_port>
-    </Action>
-    <Action ID="GeneratePlacePose"
-            editable="true">
-      <input_port name="step_name">name for the this step</input_port>
-      <input_port name="object_name">name for the object</input_port>
-      <input_port name="monitored_step_name">name for the monitored step</input_port>
-    </Action>
-    <Action ID="ModifyPlanningScene"
-            editable="true">
-      <input_port name="step_name">name for the this step</input_port>
-      <input_port name="modify_scene">scene to perform: remove_object, attach_enabled, collisions_enabled</input_port>
-      <input_port name="object_names">An array of object names, separated by commas(,), for example: object1,object2</input_port>
-      <input_port name="other_object_type">robot(robot link) or object(object link)</input_port>
-      <input_port name="other_object_names">name for the robot part, e.g. group_name(allow_collisions, forbid_collisions) or link_name(attach, detach, remove_object)</input_port>
-      <input_port name="collisions_enabled"
-                  default="true">allow or forbid collisions(attach) (true=allow, false=forbid)</input_port>
-    </Action>
-    <Action ID="MoveRelative"
-            editable="true">
-      <input_port name="step_name">name for the this step</input_port>
-      <input_port name="planner_type"
-                  default="Cartesian">use what kind of planner</input_port>
-      <input_port name="link">The robot link that will perform the relative motion</input_port>
-      <input_port name="frame_id"
-                  default="world">Frame ID for the direction vector. Default is world frame</input_port>
-      <input_port name="direction"
-                  default="0.0,0.0,0.0">Direction vector [x,y,z] in world frame. Example: [0.0,0.0,-0.1] moves down 0.1m</input_port>
-    </Action>
-    <Action ID="MoveTo"
-            editable="true">
-      <input_port name="step_name">name for the this step</input_port>
-      <input_port name="group">which group to move</input_port>
-      <input_port name="goal">which action goal want to achieve</input_port>
-      <input_port name="planner_type"
-                  default="Pipeline">Pipeline or Cartesian</input_port>
-    </Action>
-    <Control ID="SerialContainer"
-             editable="true">
-      <input_port name="container_name">Name of the MTC container</input_port>
-    </Control>
-  </TreeNodesModel>
+        <Action ID="AddObject" editable="true">
+            <input_port name="step_name">name for this step</input_port>
+            <input_port name="object_name">name of the object to add</input_port>
+            <input_port name="frame_id" default="world">frame_id for the object</input_port>
+            <input_port name="position" default="0.0,0.0,0.0,0.0,0.0,0.0">x,y,z,roll,pitch,yaw position of the object</input_port>
+            <input_port name="object_shape" default="1">shape type of the object (0=BOX, 1=SPHERE, 2=CYLINDER, 3=CONE)</input_port>
+            <input_port name="object_dimensions" default="0.0,0.0">dimensions of the object (BOX: [x,y,z], SPHERE: [radius], CYLINDER: [height,radius], CONE: [height,radius])</input_port>
+        </Action>
+        <Control ID="Alternatives" editable="true">
+            <input_port name="container_name">Name of the MTC container</input_port>
+        </Control>
+        <Decorator ID="ComputeIK" editable="true">
+            <input_port name="step_name">Name for the ComputeIK wrapper</input_port>
+            <input_port name="ik_frame_link">Link for IK frame</input_port>
+            <input_port name="ik_frame_pose">x,y,z,rx,ry,rz Pose for IK frame (e.g: 1.0,1.0,1.0,0.0,0.0,0.0)</input_port>
+        </Decorator>
+        <Action ID="Connect" editable="true">
+            <input_port name="step_name">name for the this step</input_port>
+            <input_port name="group_planner_map" default="panda_arm:pipeline">group-planner mapping (e.g. 'panda_arm:pipeline,hand_group:cartesian')</input_port>
+        </Action>
+        <Action ID="CurrentState" editable="true">
+            <input_port name="step_name">name for the this step</input_port>
+        </Action>
+        <Control ID="Fallbacks" editable="true">
+            <input_port name="container_name">container_name</input_port>
+        </Control>
+        <Action ID="GenerateGraspPose" editable="true">
+            <input_port name="step_name">name for the this step</input_port>
+            <input_port name="object_name">name for the object</input_port>
+            <input_port name="monitored_step_name">name for the monitored step</input_port>
+        </Action>
+        <Action ID="GeneratePlacePose" editable="true">
+            <input_port name="step_name">name for the this step</input_port>
+            <input_port name="object_name">name for the object</input_port>
+            <input_port name="monitored_step_name">name for the monitored step</input_port>
+        </Action>
+        <Control ID="Merger" editable="true">
+            <input_port name="container_name">Name of the MTC container</input_port>
+        </Control>
+        <Action ID="ModifyPlanningScene" editable="true">
+            <input_port name="step_name">name for the this step</input_port>
+            <input_port name="modify_scene">scene to perform: remove_object, attach_enabled, collisions_enabled</input_port>
+            <input_port name="object_names">An array of object names, separated by commas(,), for example: object1,object2</input_port>
+            <input_port name="other_object_type">robot(robot link) or object(object link)</input_port>
+            <input_port name="other_object_names">name for the robot part, e.g. group_name(allow_collisions, forbid_collisions) or link_name(attach, detach, remove_object)</input_port>
+            <input_port name="collisions_enabled" default="true">allow or forbid collisions(attach) (true=allow, false=forbid)</input_port>
+        </Action>
+        <Action ID="MoveRelative" editable="true">
+            <input_port name="step_name">name for the this step</input_port>
+            <input_port name="planner_type" default="Cartesian">use what kind of planner</input_port>
+            <input_port name="link">The robot link that will perform the relative motion</input_port>
+            <input_port name="frame_id" default="world">Frame ID for the direction vector. Default is world frame</input_port>
+            <input_port name="direction" default="0.0,0.0,0.0">Direction vector [x,y,z] in world frame. Example: [0.0,0.0,-0.1] moves down 0.1m</input_port>
+        </Action>
+        <Action ID="MoveTo" editable="true">
+            <input_port name="step_name">name for the this step</input_port>
+            <input_port name="group">which group to move</input_port>
+            <input_port name="goal">which action goal want to achieve</input_port>
+            <input_port name="planner_type" default="Pipeline">Pipeline or Cartesian</input_port>
+        </Action>
+        <Decorator ID="PassThrough" editable="true">
+            <input_port name="step_name">Name for the PassThrough wrapper</input_port>
+            <input_port name="cost_term_type">ype of cost term to use (supported types: 'path_length', 'trajectory_duration', 'link_motion', 'constant')</input_port>
+            <input_port name="cost_term_param">Parameters for the cost term (required for 'link_motion' (link name) and 'constant' (numeric value), unused for 'path_length' and 'trajectory_duration')</input_port>
+        </Decorator>
+        <Decorator ID="PredicateFilter" editable="true">
+            <input_port name="step_name">Name for the PredicateFilter wrapper</input_port>
+            <input_port name="ignore_filter" default="false">Ignore predicate and forward all solutions</input_port>
+            <input_port name="predicate_type">ype of cost term to use (supported types: 'path_length', 'trajectory_duration', 'link_motion', 'constant')</input_port>
+            <input_port name="predicate_param">Parameters for the cost term (required for 'link_motion' (link name) and 'constant' (numeric value), unused for 'path_length' and 'trajectory_duration')</input_port>
+        </Decorator>
+        <Control ID="SerialContainer" editable="true">
+            <input_port name="container_name">Name of the MTC container</input_port>
+        </Control>
+    </TreeNodesModel>
 </root>

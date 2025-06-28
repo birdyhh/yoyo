@@ -13,6 +13,8 @@ namespace moveit_mtc_bt_nodes {
 
     // wrapper name
     static const std::string COMPUTE_IK = "ComputeIK";
+    static const std::string PREDICATE_FILTER = "PredicateFilter";
+    static const std::string PASS_THROUGH = "PassThrough";
     static const std::string PROPERTY_TYPE = "type";
     static const std::string PROPERTY_CONFIG = "config";
 
@@ -57,6 +59,19 @@ namespace moveit_mtc_bt_nodes {
     static const std::string OBJECT_DIMENSIONS = "object_dimensions";
     static const std::string IK_FRAME_LINK = "ik_frame_link";
     static const std::string IK_FRAME_POSE = "ik_frame_pose";
+    static const std::string COST_TERM_TYPE = "cost_term_type";
+    static const std::string COST_TERM_PARAM = "cost_term_param";
+    static const std::string PATH_LENGTH = "path_length";
+    static const std::string TRAJECTORY_DURATION = "trajectory_duration";
+    static const std::string LINK_MOTION = "link_motion";
+    static const std::string CONSTANT = "constant";
+    static const std::string IGNORE_FILTER = "ignore_filter";
+    static const std::string PREDICATE_TYPE = "predicate_type";
+    static const std::string PREDICATE_PARAM = "predicate_param";
+    static const std::string ALWAYS_TRUE = "always_true";
+    static const std::string ALWAYS_FALSE = "always_false";
+    static const std::string COST_THRESHOLD = "cost_threshold";
+    static const std::string ATTACHED_BODY_CHECK = "attached_body_check";
 
     // ModifyPlanningScene properties
     static const std::string REMOVE_OBJECT = "remove_object";
