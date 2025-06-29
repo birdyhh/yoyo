@@ -15,6 +15,96 @@
 
 ## 解决方案设计
 
+```mermaid
+---
+title: yoyo架构图
+---
+graph TB
+    subgraph "外部接口层"
+        A[ROS 2 Service Clients]
+    end
+
+    subgraph "行为树执行层"
+        C[BehaviorTreeExecutor Node]
+        D[Update BT XML Service]
+        E[Execute MTC Task Service]
+        F[Behavior Tree Factory]
+        G[Behavior Tree Engine]
+    end
+
+    subgraph "MTC编排层"
+        H[BT MoveIt2 MTC Nodes]
+        
+        subgraph "行为树节点类型"
+            I[Action Nodes]
+            J[Control Nodes]
+            K[Decorator Nodes]
+        end
+        
+        subgraph "MTC Stages 类型"
+            R[Leaf Stages]
+            P[Container Stages]
+            Q[Wrapper Stages]
+        end
+        
+        subgraph "MTC任务组件"
+            L[MTC Task]
+            M[MTC Stages]
+            N[MTC Solvers]
+            O[Planning Scene]
+        end
+    end
+
+    subgraph "Moveit 接口层"
+        S[MoveIt2 Planning]
+        T[Robot State]
+        U[Sensor Data]
+    end
+
+    
+    C -- "创建更新行为树XML service" --> D
+    C -- "创建执行mtc service" --> E
+    C -- "创建行为树工厂" --> F
+    C -- "创建行为树引擎" --> G
+    C -- "管理MTC任务" --> L
+    
+    D -- "/update_bt_xml (UpdateBTXml.srv)" --> A
+    E -- "/execute_mtc_task (ExecuteMtcTask.srv)" --> A
+    
+    F -- "注册节点类型" --> H
+    G -- "执行行为树" --> H
+    
+    H --> I
+    H --> J
+    H --> K
+    
+    R -- "生成 Stage" --> M
+    P -- "组织Container" --> M
+    Q -- "包装Wrapper" --> M
+
+    I -. "继承" .-> R
+    J -. "继承" .-> P
+    K -. "继承" .-> Q
+    
+    M -. "继承自" .-> L
+    N -. "用于Stage规划" .-> M
+    O -- "提供环境状态" --> L
+    
+    D -- "1.解析XML创建行为树；2.初始化MTC任务" --> L
+    E -- "1.规划MTC任务；2.执行MTC任务" --> L
+    
+    L -- "使用求解器规划" --> N
+    L -- "维护环境状态" --> O
+    
+    N -- "执行具体规划" --> S
+    O -- "提供机器人状态" --> T
+    O -- "提供传感器数据" --> U
+    
+    style C fill:#cde4ff
+    style H fill:#a6cfff
+    style L fill:#f8c3a3
+```
+
 ### 方案思路
 
 * **每个 MTC stage 封装为一个行为树 Action 节点**，节点内部调用对应的 MTC stage 执行。
@@ -24,17 +114,16 @@
 
 ### 关键实现点
 
-1. 使用 BehaviorTree.CPP（类似于MoveIt 2 Pro的实现）作为行为树引擎。
-2. 每个 MTC stage 封装为 BT 的自定义 ActionNode。
-3. 行为树节点内部调用 MTC stage 执行，并返回结果给行为树。
-4. 使用行为树的 Sequence 节点实现 MTC 的 container
-5. 使用行为树的 Decorator 节点实现 MTC 的 wrapper
-6. 行为树 XML/DSL 文件描述任务逻辑，机器人运行时加载并执行。
-7. 可以通过 ROS2 action/service/topic 与 MTC 任务交互。
-8. BT 节点只负责配置和添加 stage，不负责执行，这样可以灵活组合和复用 stage。
-9. 主程序统一调用 task->init()、plan()、execute()，保证所有 stage 都已添加后再整体初始化和规划，避免重复初始化和资源冲突。
-10. 参数通过黑板传递，如 ROS2 节点、MTC Task、目标状态等，便于解耦和扩展。
-11. 行为树 tick 只做“拼装”，不做实际运动执行，所有执行和结果处理在主程序统一完成。
+1. 使用 BehaviorTree.CPP 作为行为树引擎，与 MoveIt 2 集成实现任务规划与执行。
+2. 每个 MTC stage 封装为 BT 的自定义节点，包括 ActionNode、ControlNode 和 DecoratorNode。
+3. 提供了多种 MTC stage 类型的 BT 封装，如 CurrentState、MoveTo、MoveRelative、Connect、AddObject 等 Action 节点。
+4. 实现了 SerialContainer、ParallelContainer 等 Control 节点来组织任务序列。
+5. 提供了 ComputeIK、PredicateFilter 等 Decorator 节点实现包装器功能。
+6. BehaviorTreeExecutor 节点负责加载和执行行为树，通过服务接口更新 XML 和执行 MTC 任务。
+7. 采用黑板机制在行为树节点间传递参数和数据，实现解耦。
+8. 行为树 XML 文件定义任务结构，通过解析 XML 构建实际的 MTC 任务。
+9. MTC 任务的初始化、规划和执行在 BehaviorTreeExecutor 中统一管理。
+10. 支持通过 ROS 2 服务接口动态更新行为树和执行任务，提供灵活的运行时配置能力。
 
 ### 与 ROS2 的集成
 
@@ -54,6 +143,7 @@
 ### 时序图
 
 ```mermaid
+%%{ init: { "theme": "base", "themeVariables": {"theme":"neutral","themeVariables":{"primaryColor":"#f5f5f5","primaryTextColor":"#212121","primaryBorderColor":"#9e9e9e","edgeLabelBackground":"#e0e0e0","tertiaryColor":"#eeeeee","fontFamily":"Helvetica Neue, sans-serif","fontSize":"13px","lineColor":"#757575","background":"#ffffff"}} } }%%
 sequenceDiagram
     participant Client
     participant Server as MTC Server
@@ -88,11 +178,11 @@ sequenceDiagram
 
 ```
 
-### 前置教程
+## 前置教程
 
 [使用 MTC 进行拾取和放置](https://moveit.picknik.ai/main/doc/tutorials/pick_and_place_with_moveit_task_constructor/pick_and_place_with_moveit_task_constructor.html)
 
-### 操作指南
+## 操作指南
 
 #### 基于docker环境运行
 项目提供了完整的Docker支持，可以方便地在容器环境中运行。
