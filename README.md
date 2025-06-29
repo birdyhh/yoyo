@@ -1,5 +1,12 @@
 # yoyo
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![ROS 2 Jazzy](https://img.shields.io/badge/ROS%202-Jazzy-34aec0?logo=ros)](https://docs.ros.org/en/jazzy/)
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ed?logo=docker)](https://www.docker.com/)
+[![BehaviorTree.CPP](https://img.shields.io/badge/BehaviorTree-C%2B%2B-4c1?logo=behaviortree)](https://www.behaviortree.dev/)
+[![MoveIt](https://img.shields.io/badge/MoveIt-MTC-ff6d00?logo=moveit)](https://moveit.picknik.ai/)
+[![Docker Build Status](https://github.com/birdyhh/yoyo/actions/workflows/docker_build.yml/badge.svg)](https://github.com/birdyhh/yoyo/actions/workflows/docker_build.yml)
+
 ## 为什么用行为树组织 MTC stages
 
 * **灵活性**：行为树天然支持顺序、选择、并行、条件等复杂逻辑，适合描述机器人任务流程。
@@ -94,7 +101,7 @@ sequenceDiagram
 
 ```bash
 # 使用提供的脚本构建Docker镜像：
-cd docker
+cd .docker
 ./build.sh
 ```
 
@@ -108,7 +115,7 @@ docker-compose up -d
 3. 进入容器
 ```bash
 # 构建并启动容器后，可以进入容器环境：
-docker exec -it manipulation /bin/bash
+docker exec -it yoyo /bin/bash
 ```
 
 4. 运行  
@@ -149,7 +156,7 @@ ros2 launch behavior_tree_executor behavior_tree_executor_node.launch.py
 
 3. 生成行为树xml文件  
 利用已有的[行为树节点](./src/behavior_tree_executor/tree/mtc_bt_node.btproj)，加载到[groof2](https://www.behaviortree.dev/groot/)，利用图形化工具生成行为树。
-![](./img/groot_tree.png)
+![](./.img/groot_tree.png)
 
 4. 调用service接口更新行为树xml字符串，[示例](./src/behavior_tree_executor/tree/example.xml)
 ```bash
@@ -162,4 +169,4 @@ ros2 service call /execute_mtc_task bt_service_interfaces/srv/ExecuteMtcTask
 ```
 
 6. 运行结果
-![](./img/pick_and_place.gif)
+![](./.img/pick_and_place.gif)

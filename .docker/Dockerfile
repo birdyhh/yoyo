@@ -58,8 +58,8 @@ COPY ./src /root/ros2_ws/src/
 
 # 从docker目录复制配置文件
 # 注意docker/前缀，因为我们在父上下文中
-COPY docker/workspace.sh /root/
-COPY docker/entrypoint.sh /root/
+COPY .docker/workspace.sh /root/
+COPY .docker/entrypoint.sh /root/
 
 # 使脚本可执行
 RUN chmod +x /root/workspace.sh /root/entrypoint.sh

@@ -7,11 +7,11 @@ PARENT_PATH=$(dirname "$SCRIPT_PATH")
 # Function to build the Docker image
 build_docker_image()
 {
-    LOG="Building Docker image manipulation:latest ..."
+    LOG="Building Docker image yoyo:latest ..."
     print_debug
 
     # Build the Docker image
-    sudo docker image build -f $SCRIPT_PATH/Dockerfile -t manipulation:latest $PARENT_PATH
+    sudo docker image build -f $SCRIPT_PATH/Dockerfile -t yoyo:latest $PARENT_PATH
 }
 
 # Function to create a shared folder
