@@ -30,14 +30,12 @@ jobs:
         with:
           required-ros-distributions: ${{ matrix.ros_distribution }}
 
-      - name: Build packages
-        uses: ros-tooling/action-ros-build@v0.3
+      - name: Build and test core packages only
+        uses: ros-tooling/action-ros-ci@v0.3
         with:
           package-name: |
-            behavior_tree_executor
-            bt_moveit2_mtc_nodes
-            bt_service_interfaces
-            moveit_task_constructor_core
+            --packages-skip behavior_tree_executor bt_moveit2_mtc_nodes bt_service_interfaces
+          target-ros2-distro: ${{ matrix.ros_distribution }}
           colcon-defaults: |
             {
               "build": {
@@ -45,11 +43,14 @@ jobs:
               }
             }
 
-      - name: Run tests
-        uses: ros-tooling/action-ros-test@v0.1
+      - name: Build and test all packages
+        uses: ros-tooling/action-ros-ci@v0.3
         with:
-          package-name: |
-            behavior_tree_executor
-            bt_moveit2_mtc_nodes
-            bt_service_interfaces
-            moveit_task_constructor_core
+          package-name: ""
+          target-ros2-distro: ${{ matrix.ros_distribution }}
+          colcon-defaults: |
+            {
+              "build": {
+                "cmake-args": ["-DCMAKE_BUILD_TYPE=Release"]
+              }
+            }
