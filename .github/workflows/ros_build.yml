@@ -30,6 +30,12 @@ jobs:
         with:
           required-ros-distributions: ${{ matrix.ros_distribution }}
 
+      - name: List directory contents
+        run: |
+          apt-get update
+          apt-get install -y tree
+          tree --gitignore
+
       - name: Build and test core packages only
         uses: ros-tooling/action-ros-ci@v0.3
         with:
