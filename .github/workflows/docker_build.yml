@@ -26,9 +26,7 @@ jobs:
 
       - name: List directory contents
         run: |
-          apt-get update
-          apt-get install -y tree
-          tree --gitignore /home/runner/work/yoyo/yoyo
+          ls -R /home/runner/work/yoyo/yoyo
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
