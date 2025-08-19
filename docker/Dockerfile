@@ -56,10 +56,6 @@ RUN mkdir -p /etc/udev/rules.d && \
 # 由于我们使用父目录作为上下文，因此可以复制所有内容
 COPY ./src /root/ros2_ws/src/
 
-# 初始化并更新Git子模块
-WORKDIR /root/ros2_ws/src
-RUN git submodule update --init --recursive
-
 # 从docker目录复制配置文件
 # 注意docker/前缀，因为我们在父上下文中
 COPY docker/workspace.sh /root/
