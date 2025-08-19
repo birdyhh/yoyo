@@ -1,0 +1,55 @@
+name: ROS Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ros_distribution: [jazzy]
+        include:
+          - ros_distribution: jazzy
+            docker_image: rostooling/setup-ros:ubuntu-noble-ros-jazzy-ros-base-latest
+    
+    container:
+      image: ${{ matrix.docker_image }}
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup ROS environment
+        uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: ${{ matrix.ros_distribution }}
+
+      - name: Build packages
+        uses: ros-tooling/action-ros-build@v0.3
+        with:
+          package-name: |
+            behavior_tree_executor
+            bt_moveit2_mtc_nodes
+            bt_service_interfaces
+            moveit_task_constructor_core
+          colcon-defaults: |
+            {
+              "build": {
+                "cmake-args": ["-DCMAKE_BUILD_TYPE=Release"]
+              }
+            }
+
+      - name: Run tests
+        uses: ros-tooling/action-ros-test@v0.1
+        with:
+          package-name: |
+            behavior_tree_executor
+            bt_moveit2_mtc_nodes
+            bt_service_interfaces
+            moveit_task_constructor_core

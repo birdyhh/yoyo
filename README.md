@@ -1,5 +1,8 @@
 # yoyo
 
+[![ROS Build Status](https://github.com/birdyhh/yoyo/actions/workflows/ros_build.yml/badge.svg)](https://github.com/birdyhh/yoyo/actions/workflows/ros_build.yml)
+[![Docker Build Status](https://github.com/birdyhh/yoyo/actions/workflows/docker_build.yml/badge.svg)](https://github.com/birdyhh/yoyo/actions/workflows/docker_build.yml)
+
 ## 为什么用行为树组织 MTC stages
 
 * **灵活性**：行为树天然支持顺序、选择、并行、条件等复杂逻辑，适合描述机器人任务流程。
@@ -46,7 +49,7 @@
 
 ### 时序图
 
-```mermaid
+``mermaid
 sequenceDiagram
     participant Client
     participant Server as MTC Server
